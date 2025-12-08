@@ -7,12 +7,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="47539e2c-ca52-4014-bb20-9b25772ec167" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.BoidsTutorial.dir/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.BoidsTutorial.dir/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Binaries/Win64/UnrealEditor.modules" beforeDir="false" afterPath="$PROJECT_DIR$/Binaries/Win64/UnrealEditor.modules" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/BoidsTutorial/Private/Boid.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/BoidsTutorial/Private/Boid.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/BoidsTutorial/Public/Boid.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/BoidsTutorial/Public/Boid.h" afterDir="false" />
-    </list>
+    <list default="true" id="47539e2c-ca52-4014-bb20-9b25772ec167" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -129,7 +124,7 @@
       <option name="presentableId" value="Default" />
       <updated>1765148070282</updated>
       <workItem from="1765154854482" duration="987000" />
-      <workItem from="1765156086253" duration="3286000" />
+      <workItem from="1765156086253" duration="3935000" />
     </task>
     <servers />
   </component>

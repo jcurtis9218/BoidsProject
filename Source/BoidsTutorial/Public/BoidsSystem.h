@@ -38,7 +38,6 @@ public:
 	
 	TArray<ABoid*> _boids;
 	TArray<ABoid*> get_boids();
-	FVector generate_initial_position();
 	void spawn_boids();
 	void initialize_positions();
 	FVector generate_next_position(int boid_index, FVector center_of_mass);

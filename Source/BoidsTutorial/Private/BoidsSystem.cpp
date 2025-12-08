@@ -17,24 +17,19 @@ ABoidsSystem::ABoidsSystem()
 void ABoidsSystem::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	spawn_boids();
 }
 
 // Called every frame
 void ABoidsSystem::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	update_positions();
 }
 
 TArray<ABoid*> ABoidsSystem::get_boids()
 {
 	return _boids;
-}
-
-FVector ABoidsSystem::generate_initial_position()
-{
-	return FVector();
 }
 
 void ABoidsSystem::spawn_boids()
@@ -56,7 +51,7 @@ void ABoidsSystem::initialize_positions()
 	for (ABoid* boid : get_boids())
 	{
 		FVector initial_position = FVector(x_range(gen), y_range(gen), z_range(gen));
-		boid->SetActorLocation(initial_position);
+		boid->update_position_and_rotation(initial_position, GetActorLocation());
 		boid->velocity = FVector(0, 0, 0);
 	}
 }
@@ -164,7 +159,7 @@ void ABoidsSystem::update_positions()
 	TArray<FVector> next_positions = generate_next_positions();
 	for (int i = 0; i < get_boids().Num(); i++)
 	{
-		get_boids()[i]->update_position_and_rotation(next_positions[i]);
+		get_boids()[i]->update_position_and_rotation(next_positions[i], GetActorLocation());
 	}
 	
 }

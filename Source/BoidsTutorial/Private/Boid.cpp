@@ -25,8 +25,8 @@ void ABoid::Tick(float DeltaTime)
 
 }
 
-void ABoid::update_position_and_rotation(FVector next_position)
+void ABoid::update_position_and_rotation(FVector next_position, FVector parent_location)
 {
-	SetActorLocation(next_position);
+	SetActorLocation(parent_location+next_position);
 }
 
