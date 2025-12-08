@@ -28,5 +28,7 @@ void ABoid::Tick(float DeltaTime)
 void ABoid::update_position_and_rotation(FVector next_position)
 {
 	SetActorLocation(next_position);
+	FRotator new_rotation = velocity.Rotation();
+	SetActorRotation(new_rotation);
 }
 
