@@ -19,19 +19,13 @@ void ABoidsSystem::BeginPlay()
 	Super::BeginPlay();
 	spawn_boids();
 	initialize_positions();
-	simulation_slowdown_counter = simulation_slowdown;
 }
 
 // Called every frame
 void ABoidsSystem::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	simulation_slowdown_counter -= 1;
-	if (simulation_slowdown_counter <= 0)
-	{
-		update_positions();
-		simulation_slowdown_counter = simulation_slowdown;
-	}
+	update_positions(DeltaTime);
 }
 
 TArray<ABoid*>* ABoidsSystem::get_boids()
@@ -67,7 +61,7 @@ void ABoidsSystem::initialize_positions()
 	}
 }
 
-FVector ABoidsSystem::generate_next_position(int boid_index, FVector center_of_mass, TArray<int> nearby_indices)
+FVector ABoidsSystem::generate_next_position(int boid_index, FVector center_of_mass, TArray<int> nearby_indices, float DeltaTime)
 {
 	FVector cohesion = seek_center_mass(boid_index, center_of_mass, nearby_indices.Num());
 	FVector separation = maintain_distance(boid_index, nearby_indices);
@@ -75,10 +69,10 @@ FVector ABoidsSystem::generate_next_position(int boid_index, FVector center_of_m
 	FVector border_force = stay_in_bounds(boid_index);
 	ABoid* boid = (*get_boids())[boid_index];
 	FVector acceleration= (cohesion*cohesion_strength)+(separation*separation_strength)+(alignment*alignment_strength)+(border_force*border_force_strength);
-	boid->velocity += acceleration;
+	boid->velocity += acceleration*DeltaTime*time_scale;
 	boid->velocity = boid->velocity.GetClampedToMaxSize(max_speed);
 	
-	return boid->GetActorLocation() + boid->velocity;
+	return boid->GetActorLocation() + boid->velocity*DeltaTime*time_scale;
 }
 
 FVector ABoidsSystem::seek_center_mass(int boid_index, FVector center_of_mass, int neighbor_count)
@@ -168,7 +162,7 @@ FVector ABoidsSystem::stay_in_bounds(int boid_index)
 	return offset;
 }
 
-TArray<FVector> ABoidsSystem::generate_next_positions(TArray<TArray<int>> neighbor_indices)
+TArray<FVector> ABoidsSystem::generate_next_positions(TArray<TArray<int>> neighbor_indices, float DeltaTime)
 {
 	TArray<FVector> next_positions;
 	for (int i = 0; i < get_boids()->Num(); i++)
@@ -182,12 +176,12 @@ TArray<FVector> ABoidsSystem::generate_next_positions(TArray<TArray<int>> neighb
 			}
 			center_mass /= neighbor_indices.Num();
 		}
-		next_positions.Add(generate_next_position(i, center_mass, neighbor_indices[i]));
+		next_positions.Add(generate_next_position(i, center_mass, neighbor_indices[i], DeltaTime));
 	}
 	return next_positions;
 }
 
-void ABoidsSystem::update_positions()
+void ABoidsSystem::update_positions(float DeltaTime)
 {
 	TArray<TArray<int>> neighbor_indices;
 	for (int i = 0; i < get_boids()->Num(); i++)
@@ -205,7 +199,7 @@ void ABoidsSystem::update_positions()
 			}
 		}
 	}
-	TArray<FVector> next_positions = generate_next_positions(neighbor_indices);
+	TArray<FVector> next_positions = generate_next_positions(neighbor_indices, DeltaTime);
 	int moved = 0;
 	for (int i = 0; i < get_boids()->Num(); i++)
 	{
