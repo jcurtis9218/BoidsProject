@@ -31,8 +31,20 @@ public:
 	float nearby_distance;
 
 	UPROPERTY(EditAnywhere)
+	float separation_distance;
+
+	UPROPERTY(EditAnywhere)
 	FVector domain_size;
 
+	UPROPERTY(EditAnywhere)
+	float cohesion_strength;
+
+	UPROPERTY(EditAnywhere)
+	float separation_strength;
+
+	UPROPERTY(EditAnywhere)
+	float alignment_strength;
+	
 	UPROPERTY(EditAnywhere)
 	float border_force_strength;
 
@@ -50,11 +62,11 @@ public:
 	TArray<ABoid*>* get_boids();
 	void spawn_boids();
 	void initialize_positions();
-	FVector generate_next_position(int boid_index, FVector center_of_mass);
-	FVector seek_center_mass(int boid_index);
-	FVector maintain_distance(int boid_index);
-	FVector match_nearby_velocity(int boid_index);
+	FVector generate_next_position(int boid_index, FVector center_of_mass, TArray<int> nearby_indices);
+	FVector seek_center_mass(int boid_index, FVector center_of_mass, int neighbor_count);
+	FVector maintain_distance(int boid_index, TArray<int> nearby_indices);
+	FVector match_nearby_velocity(int boid_index, TArray<int> nearby_indices);
 	FVector stay_in_bounds(int boid_index);
-	TArray<FVector> generate_next_positions();
+	TArray<FVector> generate_next_positions(TArray<TArray<int>> neighbor_indices);
 	void update_positions();
 };

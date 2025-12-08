@@ -58,82 +58,78 @@ void ABoidsSystem::initialize_positions()
 	std::uniform_int_distribution<> x_range(-domain_size.X, domain_size.X);
 	std::uniform_int_distribution<> y_range(-domain_size.Y, domain_size.Y);
 	std::uniform_int_distribution<> z_range(-domain_size.Z, domain_size.Z);
-	std::uniform_int_distribution<> vel_range(-10, 10);
 	for (ABoid* boid : *get_boids())
 	{
 		FVector initial_position = FVector(x_range(gen), y_range(gen), z_range(gen));
 		boid->update_position_and_rotation(initial_position+GetActorLocation());
-		boid->velocity = FVector(vel_range(gen)/10., vel_range(gen)/10., vel_range(gen)/10.);
+		boid->velocity = FVector(rand()-(RAND_MAX/2), rand()-(RAND_MAX/2), rand()-(RAND_MAX/2)).GetSafeNormal()*max_speed;
+		UE_LOG(LogTemp, Warning, TEXT("Initial Velocity: %f, %f, %f"), boid->velocity.X, boid->velocity.Y, boid->velocity.Z);
 	}
 }
 
-FVector ABoidsSystem::generate_next_position(int boid_index, FVector center_of_mass)
+FVector ABoidsSystem::generate_next_position(int boid_index, FVector center_of_mass, TArray<int> nearby_indices)
 {
-	FVector v1, v2, v3, v4;
-	v1 = seek_center_mass(boid_index);
-	v2 = maintain_distance(boid_index);
-	v3 = match_nearby_velocity(boid_index);
-	v4 = stay_in_bounds(boid_index);
+	FVector cohesion = seek_center_mass(boid_index, center_of_mass, nearby_indices.Num());
+	FVector separation = maintain_distance(boid_index, nearby_indices);
+	FVector alignment = match_nearby_velocity(boid_index, nearby_indices);
+	FVector border_force = stay_in_bounds(boid_index);
 	ABoid* boid = (*get_boids())[boid_index];
-	boid->velocity += v1 + v2 + v3 + v4;
-	if (boid->velocity.Size() > max_speed)
-	{
-		boid->velocity = boid->velocity*max_speed/boid->velocity.Size();
-	}
+	FVector acceleration= (cohesion*cohesion_strength)+(separation*separation_strength)+(alignment*alignment_strength)+(border_force*border_force_strength);
+	boid->velocity += acceleration;
+	boid->velocity = boid->velocity.GetClampedToMaxSize(max_speed);
+	
 	return boid->GetActorLocation() + boid->velocity;
 }
 
-FVector ABoidsSystem::seek_center_mass(int boid_index)
+FVector ABoidsSystem::seek_center_mass(int boid_index, FVector center_of_mass, int neighbor_count)
 {
-	ABoid* boid = (*get_boids())[boid_index];
-	FVector center_of_mass = FVector(0, 0, 0);
-	for (int i = 0; i < get_boids()->Num(); i++)
+	if (neighbor_count == 0)
 	{
-		if (i == boid_index)
-		{
-			continue;
-		}
-		ABoid* other_boid = (*get_boids())[i];
-		center_of_mass += other_boid->GetActorLocation();
-		
+		return FVector(0, 0, 0);
 	}
-	center_of_mass /= get_boids()->Num()-1;
-	return (center_of_mass - boid->GetActorLocation())/100.0;
+	ABoid* boid = (*get_boids())[boid_index];
+	return (center_of_mass - boid->GetActorLocation()).GetSafeNormal();
 }
 
-FVector ABoidsSystem::maintain_distance(int boid_index)
+FVector ABoidsSystem::maintain_distance(int boid_index, TArray<int> nearby_indices)
 {
 	ABoid* boid = (*get_boids())[boid_index];
-	FVector offset = FVector(0, 0, 0);
-	for (ABoid* other_boid : *get_boids())
+	FVector force = FVector(0, 0, 0);
+	for (int i = 0; i < nearby_indices.Num(); i++)
 	{
-		if (other_boid == boid)
+		FVector offset = boid->GetActorLocation() - (*get_boids())[nearby_indices[i]]->GetActorLocation();
+		float distance = offset.Size();
+
+		if (distance < separation_distance)
 		{
-			continue;
-		}
-		if ((boid->GetActorLocation() - other_boid->GetActorLocation()).Size() < nearby_distance)
-		{
-			offset -= (other_boid->GetActorLocation() - boid->GetActorLocation());
+			force += offset.GetSafeNormal()/distance;
 		}
 	}
-	return offset;
+
+	if (force.Size() > 0)
+	{
+		force = force.GetSafeNormal()*max_speed;
+	}
+
+	return force;
+	
 }
 
-FVector ABoidsSystem::match_nearby_velocity(int boid_index)
+FVector ABoidsSystem::match_nearby_velocity(int boid_index, TArray<int> nearby_indices)
 {
-	FVector offset = FVector(0, 0, 0);
 	ABoid* boid = (*get_boids())[boid_index];
-	for (int i = 0; i < get_boids()->Num(); i++)
+	FVector nearby_average_velocity = FVector(0, 0, 0);
+	for (int i = 0; i < nearby_indices.Num(); i++)
 	{
-		if (i == boid_index)
-		{
-			continue;
-		}
-		ABoid* other_boid = (*get_boids())[i];
-		offset += other_boid->velocity;
+		nearby_average_velocity += (*get_boids())[nearby_indices[i]]->velocity;
 	}
-	offset /= get_boids()->Num()-1;
-	return (offset - boid->velocity)/8.;
+	if (nearby_indices.Num() == 0)
+	{
+		return FVector(0, 0, 0);
+	}
+	nearby_average_velocity/=nearby_indices.Num();
+
+	return nearby_average_velocity-boid->velocity;
 }
 
 FVector ABoidsSystem::stay_in_bounds(int boid_index)
@@ -172,39 +168,50 @@ FVector ABoidsSystem::stay_in_bounds(int boid_index)
 	return offset;
 }
 
-TArray<FVector> ABoidsSystem::generate_next_positions()
+TArray<FVector> ABoidsSystem::generate_next_positions(TArray<TArray<int>> neighbor_indices)
 {
 	TArray<FVector> next_positions;
-	FVector center_of_mass = FVector(0, 0, 0);
-	for (ABoid* boid : _boids)
-	{
-		center_of_mass += boid->GetActorLocation();
-	}
-	center_of_mass /= get_boids()->Num();
 	for (int i = 0; i < get_boids()->Num(); i++)
 	{
-		next_positions.Add(generate_next_position(i, center_of_mass));
+		FVector center_mass = FVector(0, 0, 0);
+		if (neighbor_indices[i].Num() > 0)
+		{
+			for (int neighbor : neighbor_indices[i])
+			{
+				center_mass += (*get_boids())[neighbor]->GetActorLocation();
+			}
+			center_mass /= neighbor_indices.Num();
+		}
+		next_positions.Add(generate_next_position(i, center_mass, neighbor_indices[i]));
 	}
 	return next_positions;
 }
 
 void ABoidsSystem::update_positions()
 {
+	TArray<TArray<int>> neighbor_indices;
 	for (int i = 0; i < get_boids()->Num(); i++)
 	{
-		FVector v1, v2, v3, v4;
-		v1 = seek_center_mass(i);
-		v2 = maintain_distance(i);
-		v3 = match_nearby_velocity(i);
-		v4 = stay_in_bounds(i);
-		ABoid* boid = (*get_boids())[i];
-		boid->velocity += v1 + v2 + v3 + v4;
-		if (boid->velocity.Size() > max_speed)
+		neighbor_indices.Add(TArray<int>());
+		for (int j = 0; j < get_boids()->Num(); j++)
 		{
-			boid->velocity = boid->velocity*max_speed/boid->velocity.Size();
-			boid->update_position_and_rotation(boid->GetActorLocation()+boid->velocity);
+			if (i == j)
+			{
+				continue;
+			}
+			if (((*get_boids())[i]->GetActorLocation() - (*get_boids())[j]->GetActorLocation()).Size() < nearby_distance)
+			{
+				neighbor_indices[i].Add(j);
+			}
 		}
 	}
-	
+	TArray<FVector> next_positions = generate_next_positions(neighbor_indices);
+	int moved = 0;
+	for (int i = 0; i < get_boids()->Num(); i++)
+	{
+		(*get_boids())[i]->update_position_and_rotation(next_positions[i]);
+		moved++;
+	}
+	UE_LOG(LogTemp, Error, TEXT("%d Boids Moved"), moved);
 }
 
