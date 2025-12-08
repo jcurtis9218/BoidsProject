@@ -18,6 +18,7 @@ void ABoidsSystem::BeginPlay()
 {
 	Super::BeginPlay();
 	spawn_boids();
+	initialize_positions();
 }
 
 // Called every frame
@@ -34,9 +35,10 @@ TArray<ABoid*> ABoidsSystem::get_boids()
 
 void ABoidsSystem::spawn_boids()
 {
-	while (get_boids().Num() < boid_count)
+	for (int i = 0; i < boid_count; i++)
 	{
-		ABoid* boid = GetWorld()->SpawnActor<ABoid>(ABoid::StaticClass());
+		AActor* actor_in_world = GetWorld()->SpawnActor(boid_class);
+		ABoid* boid = Cast<ABoid>(actor_in_world);
 		get_boids().Add(boid);
 	}
 }

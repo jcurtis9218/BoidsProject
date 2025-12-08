@@ -35,6 +35,9 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	float border_force_strength;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<ABoid> boid_class;
 	
 	TArray<ABoid*> _boids;
 	TArray<ABoid*> get_boids();
