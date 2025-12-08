@@ -37,6 +37,15 @@ FVector ABoidsSystem::generate_initial_position()
 	return FVector();
 }
 
+void ABoidsSystem::spawn_boids()
+{
+	while (get_boids().Num() < boid_count)
+	{
+		ABoid* boid = GetWorld()->SpawnActor<ABoid>(ABoid::StaticClass());
+		get_boids().Add(boid);
+	}
+}
+
 void ABoidsSystem::initialize_positions()
 {
 	std::random_device rd;
@@ -48,6 +57,7 @@ void ABoidsSystem::initialize_positions()
 	{
 		FVector initial_position = FVector(x_range(gen), y_range(gen), z_range(gen));
 		boid->SetActorLocation(initial_position);
+		boid->velocity = FVector(0, 0, 0);
 	}
 }
 
