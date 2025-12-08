@@ -23,5 +23,5 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	FVector velocity;
-	void update_position_and_rotation(FVector next_position, FVector parent_location);
+	void update_position_and_rotation(FVector next_position);
 };

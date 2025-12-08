@@ -38,13 +38,20 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<ABoid> boid_class;
+
+	UPROPERTY(EditAnywhere)
+	int simulation_slowdown;
+	int simulation_slowdown_counter;
+
+	UPROPERTY(EditAnywhere)
+	float max_speed;
 	
 	TArray<ABoid*> _boids;
-	TArray<ABoid*> get_boids();
+	TArray<ABoid*>* get_boids();
 	void spawn_boids();
 	void initialize_positions();
 	FVector generate_next_position(int boid_index, FVector center_of_mass);
-	FVector seek_center_mass(int boid_index, FVector center_of_mass);
+	FVector seek_center_mass(int boid_index);
 	FVector maintain_distance(int boid_index);
 	FVector match_nearby_velocity(int boid_index);
 	FVector stay_in_bounds(int boid_index);
