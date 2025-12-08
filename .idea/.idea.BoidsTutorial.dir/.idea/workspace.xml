@@ -8,12 +8,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="47539e2c-ca52-4014-bb20-9b25772ec167" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.BoidsTutorial.dir/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.BoidsTutorial.dir/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Binaries/Win64/UnrealEditor.modules" beforeDir="false" afterPath="$PROJECT_DIR$/Binaries/Win64/UnrealEditor.modules" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Blueprints/BP_Boid.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Blueprints/BP_Boid.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Blueprints/DefaultBoidsSystem.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Blueprints/DefaultBoidsSystem.uasset" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/BoidsTutorial/Private/BoidsSystem.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/BoidsTutorial/Private/BoidsSystem.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/BoidsTutorial/Public/BoidsSystem.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/BoidsTutorial/Public/BoidsSystem.h" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -134,7 +130,7 @@
       <updated>1765148070282</updated>
       <workItem from="1765154854482" duration="987000" />
       <workItem from="1765156086253" duration="6686000" />
-      <workItem from="1765221462318" duration="12133000" />
+      <workItem from="1765221462318" duration="12603000" />
     </task>
     <servers />
   </component>
