@@ -22,7 +22,6 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
-	UPROPERTY(EditAnywhere)
-	UStaticMeshComponent* boid_mesh;
+	FVector velocity;
+	void update_position_and_rotation(FVector next_position);
 };

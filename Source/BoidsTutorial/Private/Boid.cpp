@@ -15,7 +15,7 @@ ABoid::ABoid()
 void ABoid::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	velocity = FVector(0, 0, 0);
 }
 
 // Called every frame
@@ -23,5 +23,10 @@ void ABoid::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void ABoid::update_position_and_rotation(FVector next_position)
+{
+	SetActorLocation(next_position);
 }
 
