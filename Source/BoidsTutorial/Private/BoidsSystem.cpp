@@ -71,8 +71,12 @@ FVector ABoidsSystem::generate_next_position(int boid_index, FVector center_of_m
 	FVector acceleration= (cohesion*cohesion_strength)+(separation*separation_strength)+(alignment*alignment_strength)+(border_force*border_force_strength);
 	boid->velocity += acceleration*DeltaTime*time_scale;
 	boid->velocity = boid->velocity.GetClampedToMaxSize(max_speed);
+	if (boid->velocity.Size() < max_speed/4.)
+	{
+		boid->velocity = boid->velocity.GetSafeNormal()*(max_speed/4.);
+	}
 	
-	return boid->GetActorLocation() + boid->velocity.GetSafeNormal()*DeltaTime*time_scale*max_speed;
+	return boid->GetActorLocation() + boid->velocity*DeltaTime*time_scale;
 }
 
 FVector ABoidsSystem::seek_center_mass(int boid_index, FVector center_of_mass, int neighbor_count)
